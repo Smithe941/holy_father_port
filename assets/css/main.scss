@@ -34,6 +34,11 @@ html {
   scroll-behavior: smooth;
   scroll-snap-type: y mandatory;
   scroll-padding-top: 70px; // Account for fixed navbar
+  
+  // Disable scroll snap on gallery pages
+  body:has(.gallery-page) & {
+    scroll-snap-type: none;
+  }
 }
 
 body {
@@ -44,48 +49,291 @@ body {
   min-height: 100vh;
 }
 
+// All clickable elements should have pointer cursor
+a, button {
+  cursor: pointer;
+}
+
 // Navbar styles
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background-color: $bg-secondary;
-  border-bottom: 1px solid $border-color;
+  background: transparent;
   z-index: 1000;
-  padding: $spacing-sm 0;
+  padding: $spacing-md;
 
   .navbar-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 $spacing-md;
     display: flex;
-    justify-content: center;
-    gap: $spacing-lg;
-
-    @media (max-width: $breakpoint-md) {
-      gap: $spacing-md;
-      padding: 0 $spacing-sm;
-    }
+    justify-content: flex-end; // Burger always on the right
+    align-items: center;
+    width: 100%;
+    position: relative; // For absolute positioning of back-button
   }
 
-  .navbar-link {
+  .back-button {
+    position: absolute;
+    left: $spacing-md; // Position on the left
+    cursor: pointer;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    min-height: 64px;
+    z-index: 1001;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    box-sizing: border-box;
     color: $text-primary;
     text-decoration: none;
     font-size: 1.1rem;
     font-weight: 500;
-    padding: $spacing-xs $spacing-sm;
-    transition: color 0.3s ease, background-color 0.3s ease;
-    border-radius: 4px;
+    white-space: nowrap;
 
     &:hover {
-      color: $accent-color;
-      background-color: $hover-color;
+      transform: scale(1.1);
+      opacity: 0.8;
+      color: $text-primary;
+      text-decoration: none;
+    }
+
+    &:active {
+      transform: scale(0.98);
     }
 
     @media (max-width: $breakpoint-sm) {
       font-size: 1rem;
-      padding: $spacing-xs;
+      padding: 12px 16px;
+      left: $spacing-sm;
+    }
+  }
+
+  .burger-menu-button {
+    position: relative; // For absolute positioning of lines when active
+    cursor: pointer;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    width: 80px;
+    height: 64px;
+    min-height: 64px;
+    z-index: 1001;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+
+    &:hover {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+
+    .burger-line {
+      display: block;
+      width: 100%;
+      height: 6px;
+      min-height: 6px;
+      background-color: #ffffff;
+      border-radius: 3px;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transform-origin: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 4px rgba(255, 255, 255, 0.3);
+      flex-shrink: 0;
+    }
+
+    // Transform to X when menu is open
+    &.active {
+      .burger-line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        margin-top: -3px; // Half of line height (6px / 2 = 3px)
+        
+        &:nth-child(1) {
+          transform: rotate(45deg);
+        }
+        &:nth-child(2) {
+          opacity: 0;
+          transform: scaleX(0);
+        }
+        &:nth-child(3) {
+          transform: rotate(-45deg);
+        }
+      }
+    }
+  }
+}
+
+// Fullscreen menu
+.fullscreen-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .menu-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 998;
+  }
+
+  .menu-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-lg;
+    padding: $spacing-xl;
+    z-index: 999;
+
+    @media (max-width: $breakpoint-md) {
+      gap: $spacing-md;
+      padding: $spacing-lg;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      gap: $spacing-sm;
+      padding: $spacing-md;
+    }
+  }
+
+  .menu-link {
+    color: $text-primary;
+    text-decoration: none;
+    font-size: 2.5rem;
+    font-weight: 600;
+    padding: $spacing-sm $spacing-md;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease, color 0.3s ease;
+    z-index: 1000;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+
+    @media (max-width: $breakpoint-md) {
+      font-size: 2rem;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 1.75rem;
+    }
+
+    &:hover {
+      color: $accent-color;
+      transform: translateX(10px) scale(1.05);
+    }
+
+    &:active {
+      transform: translateX(10px) scale(0.98);
+    }
+  }
+
+  // Animate in when menu opens
+  &.active .menu-link {
+    opacity: 1 !important;
+    transform: translateY(0);
+
+    &:nth-child(1) {
+      transition-delay: 0.1s;
+    }
+    &:nth-child(2) {
+      transition-delay: 0.2s;
+    }
+    &:nth-child(3) {
+      transition-delay: 0.3s;
+    }
+  }
+
+  .menu-social {
+    display: flex;
+    gap: $spacing-lg;
+    margin-top: $spacing-xl;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    z-index: 1000; // Ensure it's above backdrop
+
+    @media (max-width: $breakpoint-sm) {
+      gap: $spacing-md;
+    }
+  }
+
+  &.active {
+    .menu-social {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 0.4s;
+    }
+  }
+
+  .social-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    cursor: pointer;
+    z-index: 1001; // Ensure it's clickable
+    position: relative;
+
+    @media (max-width: $breakpoint-md) {
+      width: 50px;
+      height: 50px;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      width: 45px;
+      height: 45px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(0) invert(1); // Make SVG white
+      transition: filter 0.3s ease;
+      pointer-events: none; // Prevent image from blocking clicks
+    }
+
+    &:hover {
+      transform: scale(1.15);
+      opacity: 0.9;
+
+      img {
+        filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+      }
+    }
+
+    &:active {
+      transform: scale(1.05);
     }
   }
 }
@@ -95,6 +343,11 @@ body {
   margin-top: 0;
   min-height: 100vh;
   scroll-snap-type: y mandatory;
+  
+  // Disable scroll snap on gallery pages
+  .gallery-page & {
+    scroll-snap-type: none;
+  }
 }
 
 // Hero section
@@ -106,72 +359,100 @@ body {
   overflow: hidden;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  min-height: 100vh;
+  min-height: 100vh; // Reduced from 100vh
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: 70px; // Account for navbar
+  align-items: stretch;
+  padding-top: 8rem; // Account for navbar
+  padding-bottom: 8rem; // Account for navbar
   scroll-margin-top: 0;
 
-  .hero-image {
-    width: 100%;
-    height: auto;
-    display: block;
-    object-fit: cover;
-    max-height: 70vh;
-    margin: auto;
-
-    @media (max-width: $breakpoint-md) {
-      max-height: 60vh;
-    }
-
-    @media (max-width: $breakpoint-sm) {
-      max-height: 50vh;
-    }
+  @media (max-width: $breakpoint-md) {
+    min-height: 50vh;
   }
 
-  .hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  @media (max-width: $breakpoint-sm) {
+    min-height: auto;
+    flex-direction: column;
+  }
+
+  .hero-content {
+    flex: 0 0 33.333%; // 1/3 width
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1));
+    padding: $spacing-lg;
+    background: rgba($bg-secondary, 0.95);
     z-index: 10;
-    pointer-events: none;
+
+    @media (max-width: $breakpoint-md) {
+      flex: 0 0 40%;
+      padding: $spacing-md;
+    }
 
     @media (max-width: $breakpoint-sm) {
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+      flex: 0 0 100%;
+      min-height: auto;
+      padding: $spacing-md;
+    }
+  }
+
+  .hero-image-wrapper {
+    flex: 0 0 66.666%; // 2/3 width
+    position: relative;
+    overflow: hidden;
+
+    @media (max-width: $breakpoint-md) {
+      flex: 0 0 60%;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      flex: 0 0 100%;
+      min-height: 70vh;
+    }
+  }
+
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    min-height: calc(60vh - 70px);
+
+    @media (max-width: $breakpoint-md) {
+      min-height: calc(50vh - 70px);
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      min-height: 40vh;
     }
   }
 
   .hero-title {
-    font-size: 4.5rem;
+    font-size: 3.5rem;
     font-weight: 300;
     letter-spacing: 0.1em;
     color: $text-primary;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5);
     text-transform: uppercase;
     margin: 0;
-    text-align: center;
-    padding: 0 $spacing-md;
+    text-align: left;
+    padding: 0;
+    line-height: 1.2;
 
     @media (max-width: $breakpoint-lg) {
-      font-size: 3.5rem;
+      font-size: 2.8rem;
     }
 
     @media (max-width: $breakpoint-md) {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       letter-spacing: 0.05em;
+      text-align: center;
     }
 
     @media (max-width: $breakpoint-sm) {
-      font-size: 2rem;
+      font-size: 1.8rem;
       letter-spacing: 0.03em;
-      padding: 0 $spacing-sm;
+      text-align: center;
     }
   }
 }
@@ -515,6 +796,12 @@ body {
           transition: opacity 0.3s ease;
           z-index: 2;
           
+          // Show video as preview if no thumbnail
+          .no-thumbnail & {
+            opacity: 1;
+            z-index: 1;
+          }
+          
           // Video controls styling
           &::-webkit-media-controls-panel {
             background-color: rgba(0, 0, 0, 0.7);
@@ -586,6 +873,19 @@ body {
           }
         }
         
+        // If no thumbnail, video is always visible (showing first frame)
+        &.no-thumbnail:not(.expanded) {
+          .gallery-video {
+            opacity: 1;
+          }
+          
+          &:hover {
+            .gallery-video {
+              opacity: 1;
+            }
+          }
+        }
+        
         // Expanded video state
         &.expanded {
           .gallery-video {
@@ -619,12 +919,18 @@ body {
 // Contacts section
 .contacts-section {
   padding: $spacing-xl $spacing-md;
+  padding-top: 120px; // Account for fixed navbar
   max-width: 800px;
   margin: 0 auto;
   min-height: calc(100vh - 70px);
 
   @media (max-width: $breakpoint-md) {
     padding: $spacing-lg $spacing-sm;
+    padding-top: 120px;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding-top: 100px;
   }
 
   .contacts-container {
@@ -650,32 +956,275 @@ body {
   }
 
   .contacts-content {
-    color: $text-secondary;
-    font-size: 1.1rem;
-    line-height: 1.8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-lg;
+  }
 
-    p {
-      margin-bottom: $spacing-sm;
+  .contacts-social-buttons {
+    display: flex;
+    gap: $spacing-xl;
+    margin-top: $spacing-md;
+
+    @media (max-width: $breakpoint-sm) {
+      gap: $spacing-lg;
     }
+  }
+
+  .social-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  .contact-social-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    cursor: pointer;
+
+    @media (max-width: $breakpoint-md) {
+      width: 70px;
+      height: 70px;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      width: 60px;
+      height: 60px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: brightness(0) invert(1); // Make SVG white
+      transition: filter 0.3s ease;
+    }
+
+    &:hover {
+      transform: scale(1.15);
+      opacity: 0.9;
+
+      img {
+        filter: brightness(0) invert(1) drop-shadow(0 0 12px rgba(212, 175, 55, 0.8));
+      }
+    }
+
+    &:active {
+      transform: scale(1.05);
+    }
+  }
+
+  .username {
+    color: $text-primary;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
 
     @media (max-width: $breakpoint-sm) {
       font-size: 1rem;
     }
   }
+}
 
-  .contact-info {
-    margin-top: $spacing-md;
-    padding-top: $spacing-md;
-    border-top: 1px solid $border-color;
+// Galleries page styles
+.galleries-page {
+  padding: $spacing-lg $spacing-md;
+  padding-top: 90px; // Account for fixed navbar
+  max-width: 1600px;
+  margin: 0 auto;
+  min-height: 100vh;
 
-    p {
-      margin-bottom: $spacing-sm;
-      color: $text-primary;
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md $spacing-sm;
+    padding-top: 90px;
+  }
 
-      &:last-child {
-        margin-bottom: 0;
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-sm;
+    padding-top: 80px;
+  }
+
+
+  .galleries-page-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+    text-align: center;
+
+    @media (max-width: $breakpoint-md) {
+      font-size: 2rem;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      font-size: 1.75rem;
+    }
+  }
+
+  .galleries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: $spacing-md;
+    
+    @media (max-width: $breakpoint-md) {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: $spacing-sm;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: 1fr;
+      gap: $spacing-sm;
+    }
+  }
+
+  .gallery-card {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 16 / 9;
+    background-color: $bg-secondary;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+      .gallery-card-image img {
+        transform: scale(1.05);
+      }
+
+      .gallery-card-overlay {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%);
       }
     }
+
+    .gallery-card-image {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+      }
+    }
+
+    .gallery-card-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: $spacing-md;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0) 100%);
+      transition: background 0.3s ease;
+
+      @media (max-width: $breakpoint-sm) {
+        padding: $spacing-sm;
+      }
+    }
+
+    .gallery-card-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+      @media (max-width: $breakpoint-md) {
+        font-size: 1.5rem;
+      }
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: 1.25rem;
+      }
+    }
+  }
+}
+
+// Gallery page styles (individual gallery)
+.gallery-page {
+  padding: $spacing-lg $spacing-md;
+  padding-top: 100px; // Account for fixed navbar + extra spacing
+  max-width: 1600px;
+  margin: 0 auto;
+  min-height: 100vh;
+  scroll-snap-align: none; // Disable scroll snap for gallery page
+  scroll-snap-stop: normal;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md $spacing-sm;
+    padding-top: 100px;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-sm;
+    padding-top: 90px;
+  }
+
+  .gallery-header {
+    margin-bottom: $spacing-md;
+    padding-top: $spacing-sm; // Additional spacing from top
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: $spacing-md $spacing-lg;
+    margin-left: -$spacing-lg;
+    margin-right: -$spacing-lg;
+    margin-top: -$spacing-md;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease;
+
+    @media (max-width: $breakpoint-md) {
+      padding: $spacing-sm $spacing-md;
+      margin-left: -$spacing-md;
+      margin-right: -$spacing-md;
+      margin-top: -$spacing-sm;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      padding: $spacing-sm;
+      margin-left: -$spacing-sm;
+      margin-right: -$spacing-sm;
+      margin-top: -$spacing-sm;
+    }
+
+    .gallery-page-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: $text-primary;
+      margin: 0;
+      background: transparent; // No background
+
+      @media (max-width: $breakpoint-md) {
+        font-size: 2rem;
+      }
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: 1.75rem;
+      }
+    }
+  }
+
+  .gallery-section {
+    padding: 0;
+    margin: 0;
+    padding-top: $spacing-sm; // Additional spacing from header
+    scroll-snap-align: none; // Disable scroll snap on gallery page
+    scroll-snap-stop: normal;
+    min-height: auto; // Remove min-height that causes scroll snap issues
   }
 }
 

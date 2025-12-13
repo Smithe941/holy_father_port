@@ -1,0 +1,26 @@
+{% if item.type == "photo" %}
+<div class="gallery-item mosaic-item">
+  <button class="close-button" aria-label="Close"></button>
+  <button class="nav-button nav-button-prev" aria-label="Previous"></button>
+  <button class="nav-button nav-button-next" aria-label="Next"></button>
+  <img class="gallery-image" src="{{ item.url }}" alt="{{ item.alt }}" loading="lazy">
+</div>
+{% elsif item.type == "video" %}
+<div class="gallery-item mosaic-item video-item {% unless item.thumbnail %}no-thumbnail{% endunless %}">
+  <button class="close-button" aria-label="Close"></button>
+  <button class="nav-button nav-button-prev" aria-label="Previous"></button>
+  <button class="nav-button nav-button-next" aria-label="Next"></button>
+  <div class="video-wrapper">
+    <video class="gallery-video" preload="metadata" muted loop>
+      <source src="{{ item.url }}" type="video/mp4">
+    </video>
+    {% if item.thumbnail %}
+    <img class="video-thumbnail" src="{{ item.thumbnail }}" alt="{{ item.alt }}" loading="lazy">
+    {% endif %}
+    <div class="video-icon">
+      <img src="{{ '/assets/svg/video.svg' | relative_url }}" alt="Video icon">
+    </div>
+  </div>
+</div>
+{% endif %}
+

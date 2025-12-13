@@ -1,0 +1,105 @@
+# Hero photo (full width at top)
+hero:
+  url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080"
+  alt: "Hero Image"
+
+# Main gallery - фото та відео разом
+main:
+  # Фото
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&h=500"
+    alt: "Ultra Wide Panoramic"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1800&h=600"
+    alt: "Very Wide Landscape"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&h=800"
+    alt: "Wide Landscape"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1600&h=900"
+    alt: "Standard Landscape"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1500&h=900"
+    alt: "Medium Landscape"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1511497584788-876760111969?w=1200&h=900"
+    alt: "Wide 4:3"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1000&h=1000"
+    alt: "Square"
+  
+  - type: "video"
+    url: "https://www.pexels.com/download/video/4114797/"
+    thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0Ilu5Ca_cBZuBiDTzaLh59RNXPHm8lTx0ew&s"
+    alt: "Video 1"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&h=1200"
+    alt: "Tall 3:4"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=1200"
+    alt: "Portrait 2:3"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&h=1500"
+    alt: "Medium Portrait"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=1200"
+    alt: "Very Tall"
+  
+  - type: "photo"
+    url: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&h=1800"
+    alt: "Ultra Tall"
+
+  - type: "video"
+    url: "https://www.pexels.com/download/video/4114797/"
+    alt: "Video 2"
+
+# Galleries - перелік галерей
+galleries:
+  nature:
+    title: "Nature"
+    title_photo:
+      url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&h=800"
+      alt: "Nature Gallery"
+    items:
+      - type: "photo"
+        url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&h=800"
+        alt: "Nature Photo 1"
+      - type: "photo"
+        url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1800&h=600"
+        alt: "Nature Photo 2"
+  
+  portraits:
+    title: "Portraits"
+    title_photo:
+      url: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&h=1200"
+      alt: "Portraits Gallery"
+    items:
+      - type: "photo"
+        url: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&h=1200"
+        alt: "Portrait 1"
+      - type: "photo"
+        url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=1200"
+        alt: "Portrait 2"
+  
+  events:
+    title: "Events"
+    title_photo:
+      url: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1600&h=900"
+      alt: "Events Gallery"
+    items:
+      - type: "photo"
+        url: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1600&h=900"
+        alt: "Event 1"
+      - type: "video"
+        url: "https://www.pexels.com/download/video/4114797/"
+        alt: "Event Video"

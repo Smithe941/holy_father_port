@@ -1,0 +1,181 @@
+---
+layout: default
+title: Gallery
+---
+
+<script type="application/json" id="galleries-data">
+{% raw %}{{% endraw %}
+{% for gallery in site.data.media.galleries %}
+  {% assign gallery_key = gallery[0] %}
+  {% assign gallery_data = gallery[1] %}
+  "{{ gallery_key }}": {
+    "title": "{{ gallery_data.title }}",
+    "items": [
+      {% for item in gallery_data.items %}
+      {
+        "type": "{{ item.type }}",
+        "url": "{{ item.url }}",
+        "alt": "{{ item.alt | escape }}"{% if item.thumbnail %},"thumbnail": "{{ item.thumbnail }}"{% endif %}
+      }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+  }{% unless forloop.last %},{% endunless %}
+{% endfor %}
+{% raw %}}{% endraw %}
+</script>
+
+<div class="gallery-page">
+  <div class="gallery-header">
+    <h1 class="gallery-page-title" id="gallery-title">Loading...</h1>
+  </div>
+  
+  <div class="gallery-section">
+    <div class="gallery-container mosaic-grid" id="gallery-container">
+      <!-- Gallery items will be loaded dynamically -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // Show back button if we're on a gallery page
+  function showGalleryBackButton() {
+    const path = window.location.pathname;
+    const backButton = document.getElementById('gallery-back-button');
+    if (backButton && (path.includes('/gallery/') || path === '/gallery.html' || path.includes('/holy_father_port/gallery/'))) {
+      backButton.style.display = 'flex';
+    }
+  }
+
+  // Get gallery key from URL
+  function getGalleryKeyFromURL() {
+    const path = window.location.pathname;
+    // Match both /gallery/key and /gallery/key.html
+    const match = path.match(/\/gallery\/([^\/\.]+)/);
+    if (match) {
+      return match[1];
+    }
+    // Fallback: try to get from query string or hash
+    const urlParams = new URLSearchParams(window.location.search);
+    const galleryKey = urlParams.get('gallery');
+    if (galleryKey) {
+      return galleryKey;
+    }
+    return null;
+  }
+
+  // Load gallery data
+  function loadGallery() {
+    const galleryKey = getGalleryKeyFromURL();
+    if (!galleryKey) {
+      document.getElementById('gallery-container').innerHTML = '<p>Gallery not found</p>';
+      document.getElementById('gallery-title').textContent = 'Gallery Not Found';
+      return;
+    }
+
+    // Get gallery data from embedded JSON
+    const dataScript = document.getElementById('galleries-data');
+    if (!dataScript) {
+      document.getElementById('gallery-container').innerHTML = '<p>Gallery data not found</p>';
+      return;
+    }
+
+    let galleryData;
+    try {
+      galleryData = JSON.parse(dataScript.textContent);
+    } catch (e) {
+      console.error('Error parsing gallery data:', e);
+      document.getElementById('gallery-container').innerHTML = '<p>Error loading gallery data</p>';
+      return;
+    }
+
+    if (!galleryData[galleryKey]) {
+      document.getElementById('gallery-container').innerHTML = '<p>Gallery not found</p>';
+      document.getElementById('gallery-title').textContent = 'Gallery Not Found';
+      return;
+    }
+
+    const gallery = galleryData[galleryKey];
+    document.getElementById('gallery-title').textContent = gallery.title;
+
+    // Render gallery items
+    const container = document.getElementById('gallery-container');
+    container.innerHTML = '';
+
+    gallery.items.forEach((item, index) => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'gallery-item mosaic-item';
+      
+      if (item.type === 'video') {
+        itemDiv.classList.add('video-item');
+        if (!item.thumbnail) {
+          itemDiv.classList.add('no-thumbnail');
+        }
+      }
+
+      const videoIconPath = '{{ "/assets/svg/video.svg" | relative_url }}';
+      
+      itemDiv.innerHTML = `
+        <button class="close-button" aria-label="Close"></button>
+        <button class="nav-button nav-button-prev" aria-label="Previous"></button>
+        <button class="nav-button nav-button-next" aria-label="Next"></button>
+        ${item.type === 'photo' 
+          ? `<img class="gallery-image" src="${item.url}" alt="${item.alt || ''}" loading="lazy">`
+          : `
+            <div class="video-wrapper">
+              <video class="gallery-video" preload="metadata" muted loop>
+                <source src="${item.url}" type="video/mp4">
+              </video>
+              ${item.thumbnail ? `<img class="video-thumbnail" src="${item.thumbnail}" alt="${item.alt || ''}" loading="lazy">` : ''}
+              <div class="video-icon">
+                <img src="${videoIconPath}" alt="Video icon">
+              </div>
+            </div>
+          `
+        }
+      `;
+
+      container.appendChild(itemDiv);
+    });
+
+    // Reinitialize gallery functionality after a short delay
+    setTimeout(() => {
+      // Re-run setup functions from main.js if they exist
+      if (window.setupMosaicGrid) {
+        window.setupMosaicGrid();
+      }
+      if (window.setupVideoHover) {
+        window.setupVideoHover();
+      }
+      if (window.setupCloseButtons) {
+        window.setupCloseButtons();
+      }
+      if (window.setupNavigationButtons) {
+        window.setupNavigationButtons();
+      }
+      
+      // Setup click handlers for gallery items
+      const galleryItems = document.querySelectorAll('.mosaic-item');
+      galleryItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          if (e.target.classList.contains('close-button') || 
+              e.target.classList.contains('nav-button') ||
+              e.target.closest('.close-button') ||
+              e.target.closest('.nav-button')) {
+            return;
+          }
+          e.stopPropagation();
+          if (window.expandImage) {
+            window.expandImage(this);
+          }
+        });
+      });
+    }, 200);
+  }
+
+  // Load gallery when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    showGalleryBackButton();
+    loadGallery();
+  });
+</script>
+

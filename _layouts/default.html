@@ -4,15 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+  <link rel="icon" type="image/png" href="{{ '/assets/img/favicon.png' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
 </head>
 <body>
   <nav class="navbar">
     <div class="navbar-container">
-      <a class="navbar-link" href="{{ '/' | relative_url }}">Home</a>
-      <a class="navbar-link" href="{{ '/contacts' | relative_url }}">Contacts</a>
+      {% if page.url == '/galleries/' or page.url == '/galleries.html' or page.url contains '/galleries' %}
+        <a href="{{ '/' | relative_url }}" class="back-button">← Back</a>
+      {% elsif page.url == '/gallery.html' or page.title == 'Gallery' %}
+        <a href="{{ '/galleries' | relative_url }}" class="back-button" id="gallery-back-button" style="display: none;">← Back</a>
+      {% elsif page.url == '/contacts/' or page.url == '/contacts.html' or page.title == 'Contacts' %}
+        <a href="{{ '/' | relative_url }}" class="back-button">← Back</a>
+      {% endif %}
+      <button class="burger-menu-button" id="burger-menu-button" aria-label="Toggle menu">
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+      </button>
     </div>
   </nav>
+  
+  <div class="fullscreen-menu" id="fullscreen-menu">
+    <div class="menu-backdrop"></div>
+    <div class="menu-content">
+      <a class="menu-link" href="{{ '/' | relative_url }}">Home</a>
+      <a class="menu-link" href="{{ '/galleries' | relative_url }}">Galleries</a>
+      <a class="menu-link" href="{{ '/contacts' | relative_url }}">Contacts</a>
+      <div class="menu-social">
+        <a href="https://www.instagram.com/banderovec_s_luhanska_/" target="_blank" rel="noopener noreferrer" class="social-button social-instagram" aria-label="Instagram">
+          <img src="{{ '/assets/svg/instagram.svg' | relative_url }}" alt="Instagram">
+        </a>
+        <a href="https://t.me/Hooly_father" target="_blank" rel="noopener noreferrer" class="social-button social-telegram" aria-label="Telegram">
+          <img src="{{ '/assets/svg/telegram.svg' | relative_url }}" alt="Telegram">
+        </a>
+      </div>
+    </div>
+  </div>
   <main class="main-content">
     {{ content }}
   </main>

@@ -1,0 +1,23 @@
+---
+layout: default
+title: Galleries
+---
+
+<div class="galleries-page">
+  <h1 class="galleries-page-title">Galleries</h1>
+  <div class="galleries-grid">
+    {% for gallery in site.data.media.galleries %}
+      {% assign gallery_key = gallery[0] %}
+      {% assign gallery_data = gallery[1] %}
+      <a href="{{ '/gallery/' | append: gallery_key | relative_url }}" class="gallery-card">
+        <div class="gallery-card-image">
+          <img src="{{ gallery_data.title_photo.url }}" alt="{{ gallery_data.title_photo.alt }}" loading="lazy">
+          <div class="gallery-card-overlay">
+            <h2 class="gallery-card-title">{{ gallery_data.title }}</h2>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+

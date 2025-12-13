@@ -1,14 +1,60 @@
 // Main JavaScript file for photographer portfolio
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Ensure all images are visible (browser handles lazy loading natively)
-  const images = document.querySelectorAll('img');
-  images.forEach(img => {
-    // Remove any inline opacity styles that might have been set
-    if (img.style.opacity === '0') {
-      img.style.opacity = '';
+  // Burger menu functionality
+  const burgerButton = document.getElementById('burger-menu-button');
+  const fullscreenMenu = document.getElementById('fullscreen-menu');
+  const menuLinks = document.querySelectorAll('.menu-link');
+
+  function toggleMenu() {
+    const isActive = fullscreenMenu.classList.contains('active');
+    
+    if (isActive) {
+      // Close menu
+      fullscreenMenu.classList.remove('active');
+      burgerButton.classList.remove('active');
+      document.body.style.overflow = ''; // Restore scrolling
+    } else {
+      // Open menu
+      fullscreenMenu.classList.add('active');
+      burgerButton.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+  }
+
+  // Toggle menu on burger button click
+  if (burgerButton) {
+    burgerButton.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+  }
+
+  // Close menu when clicking on backdrop
+  if (fullscreenMenu) {
+    fullscreenMenu.addEventListener('click', function(e) {
+      if (e.target.classList.contains('menu-backdrop')) {
+        toggleMenu();
+      }
+    });
+  }
+
+  // Close menu when clicking on menu links
+  menuLinks.forEach(link => {
+    link.addEventListener('click', function() {
+      toggleMenu();
+    });
+  });
+
+  // Close menu on ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && fullscreenMenu.classList.contains('active')) {
+      toggleMenu();
     }
   });
+
+  // Images are handled natively by browser with loading="lazy" attribute
+  // No need for manual opacity handling
 
   // Smooth scroll for navigation links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -25,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Mosaic grid - automatically assign sizes based on image aspect ratio
-  function setupMosaicGrid() {
+  window.setupMosaicGrid = function() {
     const mosaicItems = document.querySelectorAll('.mosaic-item');
     
     mosaicItems.forEach(item => {
@@ -34,10 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Check for image or video thumbnail
+      // Check for image or video thumbnail (or video itself if no thumbnail)
       const img = item.querySelector('.gallery-image');
       const videoThumbnail = item.querySelector('.video-thumbnail');
-      const mediaElement = img || videoThumbnail;
+      const video = item.querySelector('.gallery-video');
+      const mediaElement = img || videoThumbnail || video;
       
       if (mediaElement) {
         // Remove existing size classes and inline styles
@@ -52,6 +99,20 @@ document.addEventListener('DOMContentLoaded', function() {
           // For video thumbnails, ensure they load properly
           if (videoThumbnail) {
             videoThumbnail.loading = 'eager'; // Force eager loading for thumbnails
+          }
+          
+          // For videos without thumbnails, wait for video to load metadata
+          if (video && !videoThumbnail) {
+            if (video.readyState >= 1) { // HAVE_METADATA
+              assignMosaicSize(item, video);
+            } else {
+              video.addEventListener('loadedmetadata', function() {
+                if (!item.classList.contains('expanded')) {
+                  assignMosaicSize(item, video);
+                }
+              }, { once: true });
+            }
+            return; // Skip image load handler for videos without thumbnails
           }
           
           const loadHandler = function() {
@@ -75,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  function assignMosaicSize(item, img) {
+  window.assignMosaicSize = function(item, img) {
     const aspectRatio = img.naturalWidth / img.naturalHeight;
     
     // Remove existing classes and inline styles
@@ -186,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  function expandImage(item) {
+  window.expandImage = function(item) {
     // If there's already an expanded item, contract it first
     if (currentExpandedItem && currentExpandedItem !== item) {
       contractImage(currentExpandedItem);
@@ -260,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
     currentExpandedItem = item;
   }
   
-  function contractImage(item) {
+  window.contractImage = function(item) {
     item.classList.remove('expanded');
     
     // Hide navigation buttons
@@ -298,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Close button handler
-  function setupCloseButtons() {
+  window.setupCloseButtons = function() {
     document.addEventListener('click', function(e) {
       if (e.target.classList.contains('close-button')) {
         e.stopPropagation();
@@ -314,26 +375,45 @@ document.addEventListener('DOMContentLoaded', function() {
   setupCloseButtons();
   
   // Video hover functionality
-  function setupVideoHover() {
+  window.setupVideoHover = function() {
     const videoItems = document.querySelectorAll('.video-item');
     
     videoItems.forEach(item => {
       const video = item.querySelector('.gallery-video');
       const thumbnail = item.querySelector('.video-thumbnail');
+      const hasThumbnail = !!thumbnail;
       
-      if (video && thumbnail) {
-        // Play video on hover
-        item.addEventListener('mouseenter', function() {
-          video.play().catch(err => {
-            console.log('Video play failed:', err);
+      if (video) {
+        // Play video on hover (only if there's a thumbnail, otherwise video is already visible)
+        if (hasThumbnail) {
+          item.addEventListener('mouseenter', function() {
+            video.play().catch(err => {
+              console.log('Video play failed:', err);
+            });
           });
-        });
-        
-        // Pause video when mouse leaves
-        item.addEventListener('mouseleave', function() {
-          video.pause();
-          video.currentTime = 0; // Reset to beginning
-        });
+          
+          // Pause video when mouse leaves
+          item.addEventListener('mouseleave', function() {
+            video.pause();
+            video.currentTime = 0; // Reset to beginning
+          });
+        } else {
+          // For videos without thumbnails, play on hover but keep first frame visible when not hovering
+          item.addEventListener('mouseenter', function() {
+            if (!item.classList.contains('expanded')) {
+              video.play().catch(err => {
+                console.log('Video play failed:', err);
+              });
+            }
+          });
+          
+          item.addEventListener('mouseleave', function() {
+            if (!item.classList.contains('expanded')) {
+              video.pause();
+              video.currentTime = 0; // Reset to beginning to show first frame
+            }
+          });
+        }
         
         // Handle video loading
         video.addEventListener('loadeddata', function() {
@@ -382,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Setup navigation buttons
-  function setupNavigationButtons() {
+  window.setupNavigationButtons = function() {
     document.addEventListener('click', function(e) {
       if (e.target.classList.contains('nav-button-prev')) {
         e.stopPropagation();

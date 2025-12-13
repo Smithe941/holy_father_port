@@ -4,41 +4,19 @@ title: Home
 ---
 
 <div class="hero-section">
-  <div class="hero-overlay">
+  <div class="hero-content">
     <h1 class="hero-title">Holy Father Photo</h1>
   </div>
-  <img class="hero-image" src="{{ site.data.photos.hero.url }}" alt="{{ site.data.photos.hero.alt }}" loading="lazy">
+  <div class="hero-image-wrapper">
+    <img class="hero-image" src="{{ site.data.media.hero.url }}" alt="{{ site.data.media.hero.alt }}" loading="lazy">
+  </div>
 </div>
 
 <div class="gallery-section">
   <div class="gallery-container mosaic-grid">
-    {% for photo in site.data.photos.gallery %}
-    <div class="gallery-item mosaic-item">
-      <button class="close-button" aria-label="Close"></button>
-      <button class="nav-button nav-button-prev" aria-label="Previous"></button>
-      <button class="nav-button nav-button-next" aria-label="Next"></button>
-      <img class="gallery-image" src="{{ photo.url }}" alt="{{ photo.alt }}" loading="lazy">
-    </div>
+    {% for item in site.data.media.main %}
+      {% include gallery-item.html item=item %}
     {% endfor %}
-    
-    {% if site.data.photos.videos %}
-      {% for video in site.data.photos.videos %}
-      <div class="gallery-item mosaic-item video-item">
-        <button class="close-button" aria-label="Close"></button>
-        <button class="nav-button nav-button-prev" aria-label="Previous"></button>
-        <button class="nav-button nav-button-next" aria-label="Next"></button>
-        <div class="video-wrapper">
-          <video class="gallery-video" preload="metadata" muted loop>
-            <source src="{{ video.url }}" type="video/mp4">
-          </video>
-          <img class="video-thumbnail" src="{{ video.thumbnail }}" alt="{{ video.alt }}" loading="lazy">
-          <div class="video-icon">
-            <img src="{{ '/assets/svg/video.svg' | relative_url }}" alt="Video icon">
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    {% endif %}
   </div>
 </div>
 
