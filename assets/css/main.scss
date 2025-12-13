@@ -470,6 +470,9 @@ a, button {
   @media (max-width: $breakpoint-sm) {
     min-height: auto;
     flex-direction: column;
+    height: 100vh;
+    padding-top: 70px; // Account for navbar on mobile
+    padding-bottom: 0;
   }
 
   .hero-content {
@@ -487,8 +490,8 @@ a, button {
     }
 
     @media (max-width: $breakpoint-sm) {
-      flex: 0 0 100%;
-      min-height: auto;
+      flex: 0 0 33.333%; // 1/3 height on mobile
+      order: 1; // First (top)
       padding: $spacing-md;
     }
   }
@@ -503,8 +506,9 @@ a, button {
     }
 
     @media (max-width: $breakpoint-sm) {
-      flex: 0 0 100%;
-      min-height: 70vh;
+      flex: 0 0 66.666%; // 2/3 height on mobile
+      order: 2; // Second (bottom)
+      min-height: 0; // Remove min-height
     }
   }
 
@@ -520,7 +524,8 @@ a, button {
     }
 
     @media (max-width: $breakpoint-sm) {
-      min-height: 40vh;
+      min-height: 0; // Let flex handle the height
+      height: 100%;
     }
   }
 
