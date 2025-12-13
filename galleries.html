@@ -3,21 +3,70 @@ layout: default
 title: Galleries
 ---
 
-<div class="galleries-page">
-  <h1 class="galleries-page-title">Galleries</h1>
-  <div class="galleries-grid">
+<div class="galleries-page" id="galleries-page">
+  <div class="galleries-background" id="galleries-background"></div>
+  <div class="galleries-list">
     {% for gallery in site.data.media.galleries %}
       {% assign gallery_key = gallery[0] %}
       {% assign gallery_data = gallery[1] %}
-      <a href="{{ '/gallery/' | append: gallery_key | relative_url }}" class="gallery-card">
-        <div class="gallery-card-image">
-          <img src="{{ gallery_data.title_photo.url }}" alt="{{ gallery_data.title_photo.alt }}" loading="lazy">
-          <div class="gallery-card-overlay">
-            <h2 class="gallery-card-title">{{ gallery_data.title }}</h2>
-          </div>
-        </div>
+      <a href="{{ '/gallery/' | append: gallery_key | relative_url }}" 
+         class="gallery-link" 
+         data-bg-image="{{ gallery_data.title_photo.url }}"
+         data-gallery-key="{{ gallery_key }}">
+        <h2 class="gallery-link-title">{{ gallery_data.title }}</h2>
       </a>
     {% endfor %}
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const galleriesPage = document.getElementById('galleries-page');
+    const galleriesBackground = document.getElementById('galleries-background');
+    const galleryLinks = document.querySelectorAll('.gallery-link');
+    const isMobile = window.innerWidth <= 576; // $breakpoint-sm
+    
+    // Set background for each link on mobile
+    if (isMobile) {
+      galleryLinks.forEach(link => {
+        const bgImage = link.dataset.bgImage;
+        if (bgImage) {
+          link.style.backgroundImage = `url(${bgImage})`;
+        }
+      });
+    } else {
+      // Desktop: Set initial background (first gallery)
+      if (galleryLinks.length > 0) {
+        const firstBg = galleryLinks[0].dataset.bgImage;
+        if (firstBg) {
+          galleriesBackground.style.backgroundImage = `url(${firstBg})`;
+        }
+      }
+      
+      // Handle hover on desktop
+      galleryLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+          const bgImage = this.dataset.bgImage;
+          if (bgImage) {
+            galleriesBackground.style.backgroundImage = `url(${bgImage})`;
+            galleriesBackground.style.opacity = '1';
+          }
+        });
+        
+        link.addEventListener('mouseleave', function() {
+          // Keep background on leave, or reset to first
+          // galleriesBackground.style.opacity = '0.5';
+        });
+      });
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      const newIsMobile = window.innerWidth <= 576;
+      if (newIsMobile !== isMobile) {
+        location.reload(); // Reload to apply correct styles
+      }
+    });
+  });
+</script>
 

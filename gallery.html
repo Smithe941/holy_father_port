@@ -104,35 +104,63 @@ title: Gallery
     gallery.items.forEach((item, index) => {
       const itemDiv = document.createElement('div');
       itemDiv.className = 'gallery-item mosaic-item';
+      itemDiv.setAttribute('data-type', item.type);
+      itemDiv.setAttribute('data-url', item.url);
+      itemDiv.setAttribute('data-alt', item.alt || '');
       
       if (item.type === 'video') {
         itemDiv.classList.add('video-item');
         if (!item.thumbnail) {
           itemDiv.classList.add('no-thumbnail');
         }
+        if (item.thumbnail) {
+          itemDiv.setAttribute('data-thumbnail', item.thumbnail);
+        }
       }
 
       const videoIconPath = '{{ "/assets/svg/video.svg" | relative_url }}';
       
-      itemDiv.innerHTML = `
-        <button class="close-button" aria-label="Close"></button>
-        <button class="nav-button nav-button-prev" aria-label="Previous"></button>
-        <button class="nav-button nav-button-next" aria-label="Next"></button>
-        ${item.type === 'photo' 
-          ? `<img class="gallery-image" src="${item.url}" alt="${item.alt || ''}" loading="lazy">`
-          : `
-            <div class="video-wrapper">
-              <video class="gallery-video" preload="metadata" muted loop>
-                <source src="${item.url}" type="video/mp4">
-              </video>
-              ${item.thumbnail ? `<img class="video-thumbnail" src="${item.thumbnail}" alt="${item.alt || ''}" loading="lazy">` : ''}
-              <div class="video-icon">
-                <img src="${videoIconPath}" alt="Video icon">
-              </div>
-            </div>
-          `
+      if (item.type === 'photo') {
+        const img = document.createElement('img');
+        img.className = 'gallery-image';
+        img.src = item.url;
+        img.alt = item.alt || '';
+        img.loading = 'lazy';
+        itemDiv.appendChild(img);
+      } else {
+        const videoWrapper = document.createElement('div');
+        videoWrapper.className = 'video-wrapper';
+        
+        const video = document.createElement('video');
+        video.className = 'gallery-video';
+        video.preload = 'metadata';
+        video.muted = true;
+        video.loop = true;
+        const source = document.createElement('source');
+        source.src = item.url;
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        videoWrapper.appendChild(video);
+        
+        if (item.thumbnail) {
+          const thumbnail = document.createElement('img');
+          thumbnail.className = 'video-thumbnail';
+          thumbnail.src = item.thumbnail;
+          thumbnail.alt = item.alt || '';
+          thumbnail.loading = 'lazy';
+          videoWrapper.appendChild(thumbnail);
         }
-      `;
+        
+        const videoIcon = document.createElement('div');
+        videoIcon.className = 'video-icon';
+        const iconImg = document.createElement('img');
+        iconImg.src = videoIconPath;
+        iconImg.alt = 'Video icon';
+        videoIcon.appendChild(iconImg);
+        videoWrapper.appendChild(videoIcon);
+        
+        itemDiv.appendChild(videoWrapper);
+      }
 
       container.appendChild(itemDiv);
     });
@@ -146,29 +174,6 @@ title: Gallery
       if (window.setupVideoHover) {
         window.setupVideoHover();
       }
-      if (window.setupCloseButtons) {
-        window.setupCloseButtons();
-      }
-      if (window.setupNavigationButtons) {
-        window.setupNavigationButtons();
-      }
-      
-      // Setup click handlers for gallery items
-      const galleryItems = document.querySelectorAll('.mosaic-item');
-      galleryItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-          if (e.target.classList.contains('close-button') || 
-              e.target.classList.contains('nav-button') ||
-              e.target.closest('.close-button') ||
-              e.target.closest('.nav-button')) {
-            return;
-          }
-          e.stopPropagation();
-          if (window.expandImage) {
-            window.expandImage(this);
-          }
-        });
-      });
     }, 200);
   }
 

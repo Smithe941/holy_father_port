@@ -17,6 +17,10 @@
       {% elsif page.url == '/contacts/' or page.url == '/contacts.html' or page.title == 'Contacts' %}
         <a href="{{ '/' | relative_url }}" class="back-button">← Back</a>
       {% endif %}
+      <div class="navbar-links" id="navbar-links">
+        <a href="{{ '/galleries' | relative_url }}" class="navbar-link">Galleries</a>
+        <a href="{{ '/contacts' | relative_url }}" class="navbar-link">Contacts</a>
+      </div>
       <button class="burger-menu-button" id="burger-menu-button" aria-label="Toggle menu">
         <span class="burger-line"></span>
         <span class="burger-line"></span>
@@ -44,6 +48,21 @@
   <main class="main-content">
     {{ content }}
   </main>
+  
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-backdrop"></div>
+    <div class="lightbox-content">
+      <div class="lightbox-main">
+        <button class="lightbox-close" id="lightbox-close" aria-label="Close">×</button>
+        <button class="lightbox-nav lightbox-nav-prev" id="lightbox-prev" aria-label="Previous">‹</button>
+        <div class="lightbox-media" id="lightbox-media"></div>
+        <button class="lightbox-nav lightbox-nav-next" id="lightbox-next" aria-label="Next">›</button>
+      </div>
+      <div class="lightbox-thumbnails" id="lightbox-thumbnails"></div>
+    </div>
+  </div>
+  
   <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
 </body>
 </html>
