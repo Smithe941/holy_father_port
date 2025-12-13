@@ -1,7 +1,7 @@
 title: "Photographer Portfolio"
 description: "Photography Portfolio"
-baseurl: "" # Залиште порожнім, якщо репозиторій в корені. Якщо в підпапці - вкажіть назву папки
-url: "" # Залиште порожнім або вкажіть ваш домен
+baseurl: "/holy_father_port" # Назва репозиторію для GitHub Pages
+url: "https://smithe941.github.io" # GitHub Pages URL
 
 # GitHub Pages налаштування
 plugins:
@@ -9,6 +9,7 @@ plugins:
 
 sass:
   style: compressed
+  sourcemap: never
 
 # Виключення файлів з обробки
 exclude:
@@ -17,4 +18,9 @@ exclude:
   - README.md
   - .gitignore
   - .git
+  - .github
+
+# Включення директорій
+include:
+  - assets
 
