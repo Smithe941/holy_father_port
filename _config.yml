@@ -1,0 +1,20 @@
+title: "Photographer Portfolio"
+description: "Photography Portfolio"
+baseurl: "" # Залиште порожнім, якщо репозиторій в корені. Якщо в підпапці - вкажіть назву папки
+url: "" # Залиште порожнім або вкажіть ваш домен
+
+# GitHub Pages налаштування
+plugins:
+  - jekyll-sass-converter
+
+sass:
+  style: compressed
+
+# Виключення файлів з обробки
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - .gitignore
+  - .git
+

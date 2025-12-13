@@ -1,0 +1,61 @@
+# Hero photo (full width at top)
+hero:
+  url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080"
+  alt: "Hero Image"
+
+# Gallery photos - 12 абсолютно різних за розміром фото
+gallery:
+  # 1. Екстремально широке panoramic (4:1)
+  - url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&h=500"
+    alt: "Ultra Wide Panoramic"
+  
+  # 2. Дуже широке ландшафтне (3:1)
+  - url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1800&h=600"
+    alt: "Very Wide Landscape"
+  
+  # 3. Широке ландшафтне (2:1)
+  - url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&h=800"
+    alt: "Wide Landscape"
+  
+  # 4. Стандартне ландшафтне (16:9)
+  - url: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1600&h=900"
+    alt: "Standard Landscape"
+  
+  # 5. Середнє ландшафтне (5:3)
+  - url: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1500&h=900"
+    alt: "Medium Landscape"
+  
+  # 6. Широке (4:3)
+  - url: "https://images.unsplash.com/photo-1511497584788-876760111969?w=1200&h=900"
+    alt: "Wide 4:3"
+  
+  # 7. Квадратне (1:1)
+  - url: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1000&h=1000"
+    alt: "Square"
+  
+  # 8. Високе (3:4)
+  - url: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&h=1200"
+    alt: "Tall 3:4"
+  
+  # 9. Портретне (2:3)
+  - url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=1200"
+    alt: "Portrait 2:3"
+  
+  # 10. Середнє портретне (3:5)
+  - url: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&h=1500"
+    alt: "Medium Portrait"
+  
+  # 11. Дуже високе (1:2)
+  - url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600&h=1200"
+    alt: "Very Tall"
+  
+  # 12. Екстремально високе (1:3)
+  - url: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&h=1800"
+    alt: "Ultra Tall"
+
+# Videos (optional)
+videos:
+  - url: "https://www.pexels.com/download/video/4114797/"
+    thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0Ilu5Ca_cBZuBiDTzaLh59RNXPHm8lTx0ew&s"
+    alt: "Video 1"
+
