@@ -259,6 +259,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (lightbox) {
       lightbox.classList.add('active');
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      // On mobile, also prevent horizontal scroll
+      if (window.innerWidth <= 768) {
+        document.body.style.overflowX = 'hidden';
+        document.documentElement.style.overflowX = 'hidden';
+        document.body.style.overflowY = 'hidden';
+        document.documentElement.style.overflowY = 'hidden';
+      }
     }
   }
 
@@ -266,6 +274,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (lightbox) {
       lightbox.classList.remove('active');
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      document.body.style.overflowX = '';
+      document.documentElement.style.overflowX = '';
+      document.body.style.overflowY = '';
+      document.documentElement.style.overflowY = '';
       currentLightboxIndex = -1;
       
       // Pause any playing videos
@@ -309,12 +322,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update thumbnails
     lightboxThumbnails.innerHTML = '';
+    const isMobile = window.innerWidth <= 768; // Match $breakpoint-md
     allGalleryItems.forEach((thumbItem, idx) => {
       const thumbWrapper = document.createElement('div');
       thumbWrapper.style.position = 'relative';
-      thumbWrapper.style.width = '100%';
-      thumbWrapper.style.minHeight = '120px';
-      thumbWrapper.style.aspectRatio = '16 / 9';
+      if (isMobile) {
+        thumbWrapper.style.width = 'auto';
+        thumbWrapper.style.height = '100%';
+        thumbWrapper.style.minWidth = '120px';
+      } else {
+        thumbWrapper.style.width = '100%';
+        thumbWrapper.style.minHeight = '120px';
+        thumbWrapper.style.aspectRatio = '16 / 9';
+      }
       thumbWrapper.style.cursor = 'pointer';
       thumbWrapper.style.borderRadius = '4px';
       thumbWrapper.style.overflow = 'hidden';
@@ -327,6 +347,9 @@ document.addEventListener('DOMContentLoaded', function() {
         thumbWrapper.classList.add('active');
       }
       
+      // Use contain on mobile, cover on desktop
+      const objectFitValue = isMobile ? 'contain' : 'cover';
+      
       if (thumbItem.dataset.type === 'photo') {
         const thumb = document.createElement('img');
         thumb.className = 'lightbox-thumbnail';
@@ -334,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
         thumb.alt = thumbItem.dataset.alt || '';
         thumb.style.width = '100%';
         thumb.style.height = '100%';
-        thumb.style.objectFit = 'cover';
+        thumb.style.objectFit = objectFitValue;
         thumbWrapper.appendChild(thumb);
       } else if (thumbItem.dataset.type === 'video') {
         const thumbnail = thumbItem.dataset.thumbnail;
@@ -345,7 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
           thumb.alt = thumbItem.dataset.alt || '';
           thumb.style.width = '100%';
           thumb.style.height = '100%';
-          thumb.style.objectFit = 'cover';
+          thumb.style.objectFit = objectFitValue;
           thumbWrapper.appendChild(thumb);
         } else {
           // For videos without thumbnail, show video element
@@ -356,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
           video.playsInline = true;
           video.style.width = '100%';
           video.style.height = '100%';
-          video.style.objectFit = 'cover';
+          video.style.objectFit = objectFitValue;
           video.addEventListener('loadeddata', function() {
             video.currentTime = 0.1; // Show first frame
           });
