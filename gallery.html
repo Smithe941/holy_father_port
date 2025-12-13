@@ -49,17 +49,41 @@ title: Gallery
   // Get gallery key from URL
   function getGalleryKeyFromURL() {
     const path = window.location.pathname;
-    // Match both /gallery/key and /gallery/key.html
-    const match = path.match(/\/gallery\/([^\/\.]+)/);
+    const baseurl = "{{ site.baseurl }}";
+    
+    // Remove baseurl from path if present
+    let relativePath = path;
+    if (baseurl && path.startsWith(baseurl)) {
+      relativePath = path.substring(baseurl.length);
+    }
+    
+    // Match both /gallery/key, /gallery/key.html, and /gallery/key/
+    const match = relativePath.match(/\/gallery\/([^\/\.]+)/);
     if (match) {
       return match[1];
     }
+    
+    // Also try matching with .html extension
+    const matchHtml = relativePath.match(/\/gallery\/([^\/]+)\.html/);
+    if (matchHtml) {
+      return matchHtml[1];
+    }
+    
     // Fallback: try to get from query string or hash
     const urlParams = new URLSearchParams(window.location.search);
     const galleryKey = urlParams.get('gallery');
     if (galleryKey) {
       return galleryKey;
     }
+    
+    // Try hash
+    if (window.location.hash) {
+      const hashKey = window.location.hash.substring(1);
+      if (hashKey) {
+        return hashKey;
+      }
+    }
+    
     return null;
   }
 

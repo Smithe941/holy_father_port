@@ -35,6 +35,11 @@ html {
   scroll-snap-type: y mandatory;
   scroll-padding-top: 70px; // Account for fixed navbar
   
+  // Disable scroll snap on mobile devices
+  @media (max-width: $breakpoint-sm) {
+    scroll-snap-type: none;
+  }
+  
   // Disable scroll snap on gallery pages
   body:has(.gallery-page) & {
     scroll-snap-type: none;
@@ -425,6 +430,11 @@ a, button {
   min-height: 100vh;
   scroll-snap-type: y mandatory;
   
+  // Disable scroll snap on mobile devices
+  @media (max-width: $breakpoint-sm) {
+    scroll-snap-type: none;
+  }
+  
   // Disable scroll snap on gallery pages
   .gallery-page & {
     scroll-snap-type: none;
@@ -446,6 +456,12 @@ a, button {
   padding-top: 8rem; // Account for navbar
   padding-bottom: 8rem; // Account for navbar
   scroll-margin-top: 0;
+
+  // Disable scroll snap on mobile
+  @media (max-width: $breakpoint-sm) {
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
+  }
 
   @media (max-width: $breakpoint-md) {
     min-height: 50vh;
@@ -551,6 +567,12 @@ a, button {
   justify-content: flex-start;
   padding-top: 90px; // Offset for fixed navbar
   scroll-margin-top: 0;
+
+  // Disable scroll snap on mobile
+  @media (max-width: $breakpoint-sm) {
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
+  }
 
   @media (max-width: $breakpoint-md) {
     padding: $spacing-md $spacing-sm;
