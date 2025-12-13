@@ -889,14 +889,21 @@ a, button {
   max-width: 800px;
   margin: 0 auto;
   min-height: calc(100vh - 70px);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 
   @media (max-width: $breakpoint-md) {
     padding: $spacing-lg $spacing-sm;
     padding-top: 120px;
+    max-width: 100%;
   }
 
   @media (max-width: $breakpoint-sm) {
+    padding: $spacing-md $spacing-sm;
     padding-top: 100px;
+    max-width: 100%;
   }
 
   .contacts-container {
@@ -904,9 +911,15 @@ a, button {
     padding: $spacing-lg;
     border-radius: 12px;
     border: 1px solid $border-color;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 
     @media (max-width: $breakpoint-sm) {
       padding: $spacing-md;
+      border-radius: 8px;
     }
   }
 
@@ -915,9 +928,15 @@ a, button {
     margin-bottom: $spacing-md;
     color: $accent-color;
     text-align: center;
+    flex-shrink: 0;
+
+    @media (max-width: $breakpoint-md) {
+      font-size: 2.2rem;
+    }
 
     @media (max-width: $breakpoint-sm) {
-      font-size: 2rem;
+      font-size: 1.8rem;
+      margin-bottom: $spacing-sm;
     }
   }
 
@@ -926,15 +945,33 @@ a, button {
     flex-direction: column;
     align-items: center;
     gap: $spacing-lg;
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+
+    @media (max-width: $breakpoint-sm) {
+      gap: $spacing-md;
+    }
   }
 
   .contacts-social-buttons {
     display: flex;
     gap: $spacing-xl;
     margin-top: $spacing-md;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+
+    @media (max-width: $breakpoint-md) {
+      gap: $spacing-lg;
+    }
 
     @media (max-width: $breakpoint-sm) {
-      gap: $spacing-lg;
+      gap: $spacing-md;
+      margin-top: $spacing-sm;
+      flex-direction: column;
+      align-items: center;
     }
   }
 
@@ -943,6 +980,15 @@ a, button {
     flex-direction: column;
     align-items: center;
     gap: $spacing-md;
+    flex: 0 0 auto;
+    width: auto;
+    box-sizing: border-box;
+
+    @media (max-width: $breakpoint-sm) {
+      gap: $spacing-sm;
+      width: 100%;
+      max-width: 200px;
+    }
   }
 
   .contact-social-button {
@@ -954,6 +1000,8 @@ a, button {
     border-radius: 50%;
     transition: transform 0.3s ease, opacity 0.3s ease;
     cursor: pointer;
+    flex-shrink: 0;
+    box-sizing: border-box;
 
     @media (max-width: $breakpoint-md) {
       width: 70px;
@@ -993,9 +1041,18 @@ a, button {
     font-weight: 500;
     margin: 0;
     text-align: center;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+
+    @media (max-width: $breakpoint-md) {
+      font-size: 1.1rem;
+    }
 
     @media (max-width: $breakpoint-sm) {
-      font-size: 1rem;
+      font-size: 0.95rem;
+      padding: 0 $spacing-xs;
     }
   }
 }
