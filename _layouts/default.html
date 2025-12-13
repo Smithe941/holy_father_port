@@ -12,8 +12,8 @@
     <div class="navbar-container">
       {% if page.url == '/galleries/' or page.url == '/galleries.html' or page.url contains '/galleries' %}
         <a href="{{ '/' | relative_url }}" class="back-button">← Back</a>
-      {% elsif page.url == '/gallery.html' or page.title == 'Gallery' %}
-        <a href="{{ '/galleries' | relative_url }}" class="back-button" id="gallery-back-button" style="display: none;">← Back</a>
+      {% elsif page.url contains '/gallery/' or page.title contains 'Gallery' %}
+        <a href="{{ '/galleries' | relative_url }}" class="back-button" id="gallery-back-button">← Back</a>
       {% elsif page.url == '/contacts/' or page.url == '/contacts.html' or page.title == 'Contacts' %}
         <a href="{{ '/' | relative_url }}" class="back-button">← Back</a>
       {% endif %}
