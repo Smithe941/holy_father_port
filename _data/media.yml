@@ -22,16 +22,6 @@ main:
 
 # Galleries - перелік галерей
 galleries:
-  portrait:
-    title: "Portrait"
-    title_photo:
-      url: "https://res.cloudinary.com/djd2n31b4/image/upload/realistic-digital-camera-vector-illustration-concept_1253202-39575_p4qulh.avif"
-      alt: "realistic-digital-camera-vector-illustration-concept_1253202-39575_p4qulh"
-    items:
-      - type: "photo"
-        url: "https://res.cloudinary.com/djd2n31b4/image/upload/realistic-digital-camera-vector-illustration-concept_1253202-39575_p4qulh.avif"
-        alt: "realistic-digital-camera-vector-illustration-concept_1253202-39575_p4qulh"
-
   street:
     title: "Street"
     title_photo:
@@ -54,4 +44,39 @@ galleries:
       - type: "photo"
         url: "https://res.cloudinary.com/djd2n31b4/image/upload/IMG_2647_vncwmq.heic"
         alt: "IMG_2647_vncwmq"
+
+  new:
+    title: "New"
+    title_photo:
+      url: "https://res.cloudinary.com/djd2n31b4/image/upload/Screenshot_2025-10-23_at_17.24.51_kgnb22.png"
+      alt: "Screenshot_2025-10-23_at_17.24.51_kgnb22"
+    items:
+      - type: "photo"
+        url: "https://res.cloudinary.com/djd2n31b4/image/upload/Screenshot_2025-10-23_at_17.24.51_kgnb22.png"
+        alt: "Screenshot_2025-10-23_at_17.24.51_kgnb22"
+      - type: "photo"
+        url: "https://res.cloudinary.com/djd2n31b4/image/upload/Screenshot_2025-10-21_at_11.08.20_qraz2e.png"
+        alt: "Screenshot_2025-10-21_at_11.08.20_qraz2e"
+      - type: "photo"
+        url: "https://res.cloudinary.com/djd2n31b4/image/upload/Screenshot_2025-10-09_at_12.55.25_ntiwes.png"
+        alt: "Screenshot_2025-10-09_at_12.55.25_ntiwes"
+      - type: "video"
+        url: "https://res.cloudinary.com/djd2n31b4/video/upload/Screen_Recording_2025-10-15_at_13.07.14_mouh60.mov"
+        alt: "Screen_Recording_2025-10-15_at_13.07.14_mouh60"
+      - type: "video"
+        url: "https://res.cloudinary.com/djd2n31b4/video/upload/Screen_Recording_2025-10-09_at_13.28.16_lrqjmz.mov"
+        alt: "Screen_Recording_2025-10-09_at_13.28.16_lrqjmz"
+      - type: "video"
+        url: "https://res.cloudinary.com/djd2n31b4/video/upload/Screen_Recording_2025-10-13_at_12.59.24_dqfzu3.mov"
+        alt: "Screen_Recording_2025-10-13_at_12.59.24_dqfzu3"
+
+  portrait:
+    title: "Portrait"
+    title_photo:
+      url: "https://res.cloudinary.com/djd2n31b4/image/upload/realistic-digital-camera-vector-illustration-concept_1253202-39575_p4qulh.avif"
+      alt: "realistic-digital-camera-vector-illustration-concept_1253202-39575_p4qulh"
+    items:
+      - type: "photo"
+        url: "https://res.cloudinary.com/djd2n31b4/image/upload/realistic-digital-camera-vector-illustration-concept_1253202-39575_p4qulh.avif"
+        alt: "realistic-digital-camera-vector-illustration-concept_1253202-39575_p4qulh"
 
