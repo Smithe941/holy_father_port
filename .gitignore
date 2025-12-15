@@ -7,5 +7,4 @@ vendor/
 # Gemfile.lock - потрібен для GitHub Pages
 .env
 .env.local
-_data/media.yml
 

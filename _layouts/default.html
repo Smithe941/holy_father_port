@@ -57,8 +57,12 @@
         <button class="lightbox-close" id="lightbox-close" aria-label="Close">×</button>
         <div class="lightbox-media" id="lightbox-media"></div>
         <div class="lightbox-nav-container">
-          <button class="lightbox-nav lightbox-nav-prev" id="lightbox-prev" aria-label="Previous">‹</button>
-          <button class="lightbox-nav lightbox-nav-next" id="lightbox-next" aria-label="Next">›</button>
+          <button class="lightbox-nav lightbox-nav-prev" id="lightbox-prev" aria-label="Previous">
+            <img src="{{ '/assets/svg/chevron-left.svg' | relative_url }}" alt="Previous" class="chevron-icon">
+          </button>
+          <button class="lightbox-nav lightbox-nav-next" id="lightbox-next" aria-label="Next">
+            <img src="{{ '/assets/svg/chevron-left.svg' | relative_url }}" alt="Next" class="chevron-icon chevron-icon-flipped">
+          </button>
         </div>
       </div>
       <div class="lightbox-thumbnails" id="lightbox-thumbnails"></div>

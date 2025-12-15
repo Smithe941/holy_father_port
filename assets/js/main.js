@@ -35,12 +35,73 @@ document.addEventListener('DOMContentLoaded', function() {
     if (burgerButton) burgerButton.classList.add('visible');
   }
 
+  // Prevent scroll snap from bouncing back to top when at bottom on mobile
+  if (isMobile) {
+    let isAtBottom = false;
+    let scrollTimeout;
+    
+    function checkIfAtBottom() {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollBottom = scrollTop + windowHeight;
+      
+      // Check if we're at the bottom (with 50px threshold)
+      isAtBottom = scrollBottom >= documentHeight - 50;
+      
+      // Temporarily disable scroll snap when at bottom
+      if (isAtBottom) {
+        document.documentElement.style.scrollSnapType = 'none';
+        document.querySelector('.main-content')?.style.setProperty('scroll-snap-type', 'none');
+      } else {
+        document.documentElement.style.scrollSnapType = '';
+        document.querySelector('.main-content')?.style.removeProperty('scroll-snap-type');
+      }
+    }
+    
+    // Check on scroll
+    window.addEventListener('scroll', function() {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(checkIfAtBottom, 100);
+      checkIfAtBottom();
+    }, { passive: true });
+    
+    // Initial check
+    checkIfAtBottom();
+    
+    // Check on resize
+    window.addEventListener('resize', function() {
+      checkIfAtBottom();
+    }, { passive: true });
+  }
+
   // Burger menu functionality
   const fullscreenMenu = document.getElementById('fullscreen-menu');
   const menuLinks = document.querySelectorAll('.menu-link');
+  let isMenuTransitioning = false; // Flag to prevent multiple toggles during animation
+
+  function resetTransitionState() {
+    isMenuTransitioning = false;
+    if (burgerButton) {
+      burgerButton.style.pointerEvents = '';
+    }
+  }
 
   function toggleMenu() {
+    // Prevent multiple toggles during animation
+    if (isMenuTransitioning) {
+      return;
+    }
+    
     const isActive = fullscreenMenu.classList.contains('active');
+    
+    // Set flag to prevent multiple toggles
+    isMenuTransitioning = true;
+    
+    // Disable pointer events during animation to prevent clicks
+    if (burgerButton) {
+      burgerButton.style.pointerEvents = 'none';
+    }
     
     if (isActive) {
       // Close menu
@@ -53,13 +114,49 @@ document.addEventListener('DOMContentLoaded', function() {
       burgerButton.classList.add('active');
       document.body.style.overflow = 'hidden'; // Prevent scrolling
     }
+    
+    // Listen for transition end on burger button lines
+    const burgerLines = burgerButton ? burgerButton.querySelectorAll('.burger-line') : [];
+    let transitionEndCount = 0;
+    const totalLines = burgerLines.length;
+    
+    function handleTransitionEnd(e) {
+      // Only count transitions on transform property
+      if (e.propertyName === 'transform' || e.propertyName === 'opacity') {
+        transitionEndCount++;
+        if (transitionEndCount >= totalLines || totalLines === 0) {
+          resetTransitionState();
+          // Remove listeners after completion
+          burgerLines.forEach(line => {
+            line.removeEventListener('transitionend', handleTransitionEnd);
+          });
+        }
+      }
+    }
+    
+    // Add transition end listeners
+    burgerLines.forEach(line => {
+      line.addEventListener('transitionend', handleTransitionEnd);
+    });
+    
+    // Fallback timeout in case transitionend doesn't fire
+    setTimeout(() => {
+      resetTransitionState();
+      burgerLines.forEach(line => {
+        line.removeEventListener('transitionend', handleTransitionEnd);
+      });
+    }, 400); // Slightly longer than CSS transition (300ms) to ensure completion
   }
 
   // Toggle menu on burger button click
   if (burgerButton) {
-    burgerButton.addEventListener('click', function(e) {
-      e.stopPropagation();
-      toggleMenu();
+    // Use both click and touchstart for better mobile support
+    ['click', 'touchstart'].forEach(eventType => {
+      burgerButton.addEventListener(eventType, function(e) {
+        e.stopPropagation();
+        e.preventDefault(); // Prevent default behavior
+        toggleMenu();
+      }, { passive: false });
     });
   }
 
@@ -223,6 +320,73 @@ document.addEventListener('DOMContentLoaded', function() {
   // Setup mosaic grid
   setupMosaicGrid();
 
+  // Parallax effect on hover for desktop
+  function setupParallaxEffect() {
+    if (isMobile) return; // Only on desktop
+    
+    const mosaicItems = document.querySelectorAll('.mosaic-item:not(.expanded)');
+    
+    mosaicItems.forEach(item => {
+      const img = item.querySelector('.gallery-image, .video-thumbnail, .gallery-video');
+      if (!img) return;
+      
+      // Remove existing listeners by using a flag
+      if (item.dataset.parallaxSetup === 'true') return;
+      item.dataset.parallaxSetup = 'true';
+      
+      item.addEventListener('mouseenter', function() {
+        if (img) {
+          img.style.transform = 'scale(1.02) translate(0, 0)';
+        }
+      });
+      
+      item.addEventListener('mousemove', function(e) {
+        if (!img) return;
+        
+        const rect = item.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Calculate center of element
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Calculate offset from center (-1 to 1)
+        const offsetX = (x - centerX) / centerX;
+        const offsetY = (y - centerY) / centerY;
+        
+        // Apply parallax transform (max 10px movement) while keeping scale
+        const moveX = offsetX * 10;
+        const moveY = offsetY * 10;
+        
+        img.style.transform = `scale(1.02) translate(${moveX}px, ${moveY}px)`;
+        img.style.transition = 'transform 0.1s ease-out';
+      });
+      
+      item.addEventListener('mouseleave', function() {
+        if (img) {
+          // Reset to just scale, no translate
+          img.style.transform = 'scale(1)';
+          img.style.transition = 'transform 0.3s ease-out';
+        }
+      });
+    });
+  }
+  
+  // Setup parallax after grid is ready
+  setupParallaxEffect();
+  
+  // Re-setup parallax when grid is recalculated
+  const originalSetupMosaicGrid = setupMosaicGrid;
+  window.setupMosaicGrid = function() {
+    originalSetupMosaicGrid();
+    // Clear parallax flags and re-setup
+    document.querySelectorAll('.mosaic-item').forEach(item => {
+      delete item.dataset.parallaxSetup;
+    });
+    setTimeout(setupParallaxEffect, 50);
+  };
+
   // Recalculate on window resize (with debounce)
   let resizeTimeout;
   window.addEventListener('resize', function() {
@@ -272,6 +436,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function closeLightbox() {
     if (lightbox) {
+      // Reset any transform from swiping
+      const mediaElement = lightboxMedia ? lightboxMedia.querySelector('img, video') : null;
+      if (mediaElement) {
+        mediaElement.style.transform = '';
+        mediaElement.style.opacity = '';
+        mediaElement.style.transition = '';
+      }
+      
       lightbox.classList.remove('active');
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
@@ -282,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
       currentLightboxIndex = -1;
       
       // Pause any playing videos
-      const video = lightboxMedia.querySelector('video');
+      const video = lightboxMedia ? lightboxMedia.querySelector('video') : null;
       if (video) {
         video.pause();
         video.currentTime = 0;
@@ -304,6 +476,10 @@ document.addEventListener('DOMContentLoaded', function() {
       const img = document.createElement('img');
       img.src = url;
       img.alt = alt;
+      // Reset transform for new image
+      img.style.transform = 'translateX(0)';
+      img.style.opacity = '1';
+      img.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
       lightboxMedia.appendChild(img);
     } else if (type === 'video') {
       const video = document.createElement('video');
@@ -312,6 +488,10 @@ document.addEventListener('DOMContentLoaded', function() {
       video.autoplay = true;
       video.muted = false;
       video.loop = false;
+      // Reset transform for new video
+      video.style.transform = 'translateX(0)';
+      video.style.opacity = '1';
+      video.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
       lightboxMedia.appendChild(video);
       
       // Try to play video
@@ -580,36 +760,135 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Swipe navigation for mobile
+  // Swipe navigation for mobile with drag animation
+  // Works in mobile emulation in DevTools too
   function setupSwipeNavigation() {
     let touchStartX = 0;
-    let touchEndX = 0;
-    const minSwipeDistance = 50;
+    let touchCurrentX = 0;
+    let isDragging = false;
+    const minSwipeDistance = 100;
+    const maxDragDistance = window.innerWidth * 0.5; // Max 50% of screen width
     
-    if (!lightbox) return;
+    if (!lightbox || !lightboxMedia) return;
     
-    lightbox.addEventListener('touchstart', function(e) {
-      if (lightbox.classList.contains('active')) {
-        touchStartX = e.changedTouches[0].screenX;
+    // Get or wait for media element
+    function getMediaElement() {
+      return lightboxMedia.querySelector('img, video');
+    }
+    
+    // Reset transform
+    function resetTransform() {
+      const mediaElement = getMediaElement();
+      if (mediaElement) {
+        mediaElement.style.transform = 'translateX(0)';
+        mediaElement.style.opacity = '1';
       }
-    }, { passive: true });
+    }
     
-    lightbox.addEventListener('touchend', function(e) {
+    // Handle drag (works for both touch and mouse)
+    function handleDragStart(e) {
       if (!lightbox.classList.contains('active')) return;
       
-      touchEndX = e.changedTouches[0].screenX;
-      const deltaX = touchEndX - touchStartX;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      touchStartX = clientX;
+      touchCurrentX = touchStartX;
+      isDragging = true;
+      
+      const mediaElement = getMediaElement();
+      if (mediaElement) {
+        mediaElement.style.transition = 'none';
+      }
+      
+      // Prevent default for mouse events
+      if (!e.touches) {
+        e.preventDefault();
+      }
+    }
+    
+    function handleDragMove(e) {
+      if (!lightbox.classList.contains('active') || !isDragging) return;
+      
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      touchCurrentX = clientX;
+      const deltaX = touchCurrentX - touchStartX;
+      
+      // Limit drag distance
+      const limitedDeltaX = Math.max(-maxDragDistance, Math.min(maxDragDistance, deltaX));
+      
+      // Calculate opacity based on drag distance
+      const opacity = 1 - Math.abs(limitedDeltaX) / maxDragDistance * 0.5;
+      
+      // Apply transform in real-time
+      const mediaElement = getMediaElement();
+      if (mediaElement) {
+        mediaElement.style.transform = `translateX(${limitedDeltaX}px)`;
+        mediaElement.style.opacity = opacity;
+      }
+      
+      // Prevent default for mouse events
+      if (!e.touches) {
+        e.preventDefault();
+      }
+    }
+    
+    function handleDragEnd(e) {
+      if (!lightbox.classList.contains('active') || !isDragging) return;
+      
+      isDragging = false;
+      const deltaX = touchCurrentX - touchStartX;
+      
+      // Re-enable transition
+      const mediaElement = getMediaElement();
+      if (mediaElement) {
+        mediaElement.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
+      }
       
       if (Math.abs(deltaX) > minSwipeDistance) {
+        // Swipe detected - navigate to next/previous
         if (deltaX > 0 && currentLightboxIndex > 0) {
           // Swipe right - go to previous
-          openLightbox(currentLightboxIndex - 1);
+          if (mediaElement) {
+            mediaElement.style.transform = `translateX(${window.innerWidth}px)`;
+            mediaElement.style.opacity = '0';
+          }
+          setTimeout(() => {
+            openLightbox(currentLightboxIndex - 1);
+            resetTransform();
+          }, 50);
         } else if (deltaX < 0 && currentLightboxIndex < allGalleryItems.length - 1) {
           // Swipe left - go to next
-          openLightbox(currentLightboxIndex + 1);
+          if (mediaElement) {
+            mediaElement.style.transform = `translateX(-${window.innerWidth}px)`;
+            mediaElement.style.opacity = '0';
+          }
+          setTimeout(() => {
+            openLightbox(currentLightboxIndex + 1);
+            resetTransform();
+          }, 50);
+        } else {
+          // Not enough distance or at boundary - snap back
+          resetTransform();
         }
+      } else {
+        // Not enough distance - snap back
+        resetTransform();
       }
-    }, { passive: true });
+    }
+    
+    // Touch events (for real mobile devices)
+    lightbox.addEventListener('touchstart', handleDragStart, { passive: true });
+    lightbox.addEventListener('touchmove', handleDragMove, { passive: true });
+    lightbox.addEventListener('touchend', handleDragEnd, { passive: true });
+    
+    // Mouse events (for DevTools mobile emulation and desktop testing)
+    // Only enable on mobile breakpoint or when in mobile emulation
+    const isMobileView = window.innerWidth <= 768;
+    if (isMobileView) {
+      lightbox.addEventListener('mousedown', handleDragStart);
+      lightbox.addEventListener('mousemove', handleDragMove);
+      lightbox.addEventListener('mouseup', handleDragEnd);
+      lightbox.addEventListener('mouseleave', handleDragEnd); // Handle mouse leaving element
+    }
   }
   
   setupSwipeNavigation();

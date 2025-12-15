@@ -35,9 +35,8 @@ html {
   scroll-snap-type: y mandatory;
   scroll-padding-top: 70px; // Account for fixed navbar
   
-  // Disable scroll snap on mobile devices
+  // Keep scroll snap on mobile but handle edge cases with JS
   @media (max-width: $breakpoint-sm) {
-    scroll-snap-type: none;
     scrollbar-width: none; // Firefox
     -ms-overflow-style: none; // IE and Edge
     
@@ -172,13 +171,21 @@ a, button {
 
     @media (max-width: $breakpoint-sm) {
       font-size: 1rem;
+      
+      &:hover {
+        transform: none !important;
+      }
+      
+      &:active {
+        transform: none !important;
+      }
       padding: 12px 16px;
       left: $spacing-sm;
     }
   }
 
   .burger-menu-button {
-    position: relative; // For absolute positioning of lines when active
+    position: relative;
     cursor: pointer;
     padding: 12px;
     display: flex;
@@ -193,6 +200,8 @@ a, button {
     box-sizing: border-box;
     background: transparent;
     border: none;
+    user-select: none; // Prevent text selection
+    -webkit-tap-highlight-color: transparent; // Remove tap highlight on mobile
     opacity: 0;
     transform: translateY(-10px);
     pointer-events: none;
@@ -229,25 +238,53 @@ a, button {
       min-height: 6px;
       background-color: #ffffff;
       border-radius: 3px;
-      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                  opacity 0.3s ease;
       transform-origin: center;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 4px rgba(255, 255, 255, 0.3);
       flex-shrink: 0;
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      will-change: transform; // Optimize for animation
 
       @media (max-width: $breakpoint-sm) {
         height: 4px;
         min-height: 4px;
         border-radius: 2px;
+        left: 8px;
+        right: 8px;
+      }
+      
+      // Initial positions for three lines
+      &:nth-child(1) {
+        top: 12px;
+        @media (max-width: $breakpoint-sm) {
+          top: 8px;
+        }
+      }
+      &:nth-child(2) {
+        top: 50%;
+        margin-top: -3px; // Half of line height (6px / 2 = 3px)
+        @media (max-width: $breakpoint-sm) {
+          margin-top: -2px; // Half of line height (4px / 2 = 2px)
+        }
+      }
+      &:nth-child(3) {
+        bottom: 12px;
+        top: auto;
+        @media (max-width: $breakpoint-sm) {
+          bottom: 8px;
+        }
       }
     }
 
     // Transform to X when menu is open
     &.active {
       .burger-line {
-        position: absolute;
+        // All lines move to center - position change is instant, transform animates
         top: 50%;
-        left: 0;
-        right: 0;
+        bottom: auto;
         margin-top: -3px; // Half of line height (6px / 2 = 3px)
         
         @media (max-width: $breakpoint-sm) {
@@ -445,11 +482,7 @@ a, button {
   min-height: 100vh;
   scroll-snap-type: y mandatory;
   
-  // Disable scroll snap on mobile devices
-  @media (max-width: $breakpoint-sm) {
-    scroll-snap-type: none;
-  }
-  
+  // Keep scroll snap on mobile (handled with JS to prevent bottom bounce)
   // Disable scroll snap on gallery pages
   .gallery-page & {
     scroll-snap-type: none;
@@ -472,11 +505,7 @@ a, button {
   padding-bottom: 8rem; // Account for navbar
   scroll-margin-top: 0;
 
-  // Disable scroll snap on mobile
-  @media (max-width: $breakpoint-sm) {
-    scroll-snap-align: none;
-    scroll-snap-stop: normal;
-  }
+  // Keep scroll snap on mobile (handled with JS)
 
   @media (max-width: $breakpoint-md) {
     min-height: 50vh;
@@ -486,8 +515,7 @@ a, button {
     min-height: auto;
     flex-direction: column;
     height: 100vh;
-    padding-top: 70px; // Account for navbar on mobile
-    padding-bottom: 0;
+    padding: 0;
   }
 
   .hero-content {
@@ -505,7 +533,7 @@ a, button {
     }
 
     @media (max-width: $breakpoint-sm) {
-      flex: 0 0 33.333%; // 1/3 height on mobile
+      flex: 0 0 20%; // 1/3 height on mobile
       order: 1; // First (top)
       padding: $spacing-md;
     }
@@ -588,11 +616,7 @@ a, button {
   padding-top: 90px; // Offset for fixed navbar
   scroll-margin-top: 0;
 
-  // Disable scroll snap on mobile
-  @media (max-width: $breakpoint-sm) {
-    scroll-snap-align: none;
-    scroll-snap-stop: normal;
-  }
+  // Keep scroll snap on mobile (handled with JS)
 
   @media (max-width: $breakpoint-md) {
     padding: $spacing-md $spacing-sm;
@@ -624,22 +648,29 @@ a, button {
 
     .gallery-item.mosaic-item {
       overflow: hidden;
-      border-radius: 8px;
       background-color: $bg-secondary;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: box-shadow 0.3s ease;
       cursor: pointer;
-      
-      &:hover {
-        transform: scale(1.02);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      }
       position: relative;
       will-change: grid-column, grid-row;
+      
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
 
       &:hover:not(.expanded) {
-        transform: scale(1.02);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         z-index: 5;
+        
+        img, video {
+          transform: scale(1.02);
+          will-change: transform; // Optimize for parallax animation
+        }
+      }
+      
+      // Default state for images/videos
+      img, video {
+        transition: transform 0.3s ease;
       }
 
       // Expanded state
@@ -1142,6 +1173,16 @@ a, button {
         color: $accent-color;
         transform: scale(1.1);
       }
+      
+      // Disable hover effects on mobile
+      @media (max-width: $breakpoint-sm) {
+        transform: none;
+        
+        .gallery-link-title {
+          color: $text-primary;
+          transform: none;
+        }
+      }
     }
 
     @media (max-width: $breakpoint-sm) {
@@ -1151,7 +1192,7 @@ a, button {
       background-position: center;
       background-repeat: no-repeat;
       
-      // Background will be set via inline style from JavaScript
+      // Background overlay on mobile
       &::before {
         content: '';
         position: absolute;
@@ -1161,6 +1202,15 @@ a, button {
         bottom: 0;
         background: rgba($bg-primary, 0.4);
         z-index: 0;
+      }
+      
+      // Prevent background from changing on hover, focus, active
+      &:hover,
+      &:focus,
+      &:active {
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
       }
       
       .gallery-link-title {
@@ -1408,7 +1458,6 @@ a, button {
       max-width: 100%;
       max-height: calc(100vh - 120px);
       object-fit: contain;
-      border-radius: 8px;
       box-sizing: border-box;
     }
 
@@ -1456,18 +1505,26 @@ a, button {
     border: 2px solid rgba(255, 255, 255, 0.3);
     background: rgba(0, 0, 0, 0.5);
     color: $text-primary;
-    font-size: 2.5rem;
-    line-height: 1;
     cursor: pointer;
     border-radius: 50%;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 300;
     padding: 0;
     margin: 0;
-    text-align: center;
+
+    .chevron-icon {
+      width: 24px;
+      height: 24px;
+      display: block;
+      filter: brightness(0) invert(1); // Make SVG white
+      transition: transform 0.3s ease;
+    }
+
+    .chevron-icon-flipped {
+      transform: scaleX(-1); // Flip for right arrow
+    }
 
     &:hover:not(:disabled) {
       background: rgba(255, 255, 255, 0.2);
@@ -1483,7 +1540,11 @@ a, button {
     @media (max-width: $breakpoint-sm) {
       width: 40px;
       height: 40px;
-      font-size: 1.5rem;
+
+      .chevron-icon {
+        width: 20px;
+        height: 20px;
+      }
     }
   }
 
@@ -1542,6 +1603,27 @@ a, button {
       height: 100%;
       min-width: 120px;
       object-fit: contain; // Show full photo instead of cropping
+    }
+  }
+}
+
+// Disable hover and scale effects on mobile
+@media (max-width: $breakpoint-md) {
+  * {
+    &:hover {
+      transform: none !important;
+    }
+    
+    &:active {
+      transform: none !important;
+    }
+  }
+  
+  // Lightbox swipe - allow dragging
+  .lightbox-media {
+    img, video {
+      touch-action: pan-y; // Allow vertical scrolling but handle horizontal drag
+      will-change: transform, opacity; // Optimize for performance
     }
   }
 }

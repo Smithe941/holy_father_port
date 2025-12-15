@@ -26,12 +26,25 @@ title: Galleries
     const galleryLinks = document.querySelectorAll('.gallery-link');
     const isMobile = window.innerWidth <= 576; // $breakpoint-sm
     
-    // Set background for each link on mobile
     if (isMobile) {
+      // Set static background for each link on mobile (doesn't change on interaction)
       galleryLinks.forEach(link => {
         const bgImage = link.dataset.bgImage;
         if (bgImage) {
-          link.style.backgroundImage = `url(${bgImage})`;
+          const bgUrl = `url(${bgImage})`;
+          link.style.backgroundImage = bgUrl;
+          // Store original background to prevent changes
+          link.dataset.originalBg = bgUrl;
+          
+          // Prevent background from changing on any interaction
+          ['mouseenter', 'mouseleave', 'focus', 'blur', 'touchstart', 'touchend'].forEach(eventType => {
+            link.addEventListener(eventType, function(e) {
+              // Restore original background if it was changed
+              if (this.style.backgroundImage !== bgUrl) {
+                this.style.backgroundImage = bgUrl;
+              }
+            });
+          });
         }
       });
     } else {
