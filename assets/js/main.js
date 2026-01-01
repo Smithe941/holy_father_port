@@ -474,12 +474,18 @@ document.addEventListener('DOMContentLoaded', function() {
     lightboxMedia.innerHTML = '';
     if (type === 'photo') {
       const img = document.createElement('img');
-      img.src = url;
       img.alt = alt;
       // Reset transform for new image
       img.style.transform = 'translateX(0)';
-      img.style.opacity = '1';
+      img.style.opacity = '0'; // Start hidden, fade in when loaded
       img.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
+      // Load full-size image only when lightbox is opened
+      img.loading = 'eager'; // Eager load since lightbox is already open
+      img.src = url; // Full-size URL from data-url attribute
+      // Fade in when image loads
+      img.onload = function() {
+        img.style.opacity = '1';
+      };
       lightboxMedia.appendChild(img);
     } else if (type === 'video') {
       const video = document.createElement('video');

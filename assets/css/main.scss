@@ -187,14 +187,14 @@ a, button {
   .burger-menu-button {
     position: relative;
     cursor: pointer;
-    padding: 12px;
+    padding: 9px; // 12px * 0.75 = 9px (25% smaller)
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: stretch;
-    width: 80px;
-    height: 64px;
-    min-height: 64px;
+    width: 60px; // 80px * 0.75 = 60px (25% smaller)
+    height: 48px; // 64px * 0.75 = 48px (25% smaller)
+    min-height: 48px; // 64px * 0.75 = 48px (25% smaller)
     z-index: 1001;
     transition: transform 0.3s ease, opacity 0.3s ease;
     box-sizing: border-box;
@@ -214,10 +214,10 @@ a, button {
     }
 
     @media (max-width: $breakpoint-sm) {
-      width: 50px;
-      height: 40px;
-      min-height: 40px;
-      padding: 8px;
+      width: 38px; // 50px * 0.75 = 37.5px, rounded to 38px (25% smaller)
+      height: 30px; // 40px * 0.75 = 30px (25% smaller)
+      min-height: 30px; // 40px * 0.75 = 30px (25% smaller)
+      padding: 6px; // 8px * 0.75 = 6px (25% smaller)
       opacity: 1;
       transform: translateY(0);
       pointer-events: auto;
@@ -233,34 +233,34 @@ a, button {
 
     .burger-line {
       display: block;
-      width: 100%;
-      height: 6px;
-      min-height: 6px;
+      width: 70%;
+      height: 4px;
+      min-height: 4px;
       background-color: #ffffff;
-      border-radius: 3px;
+      border-radius: 0; // No rounded corners
       transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55),
                   opacity 0.3s ease;
       transform-origin: center;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 4px rgba(255, 255, 255, 0.3);
       flex-shrink: 0;
       position: absolute;
-      left: 12px;
-      right: 12px;
+      left: 9px; // Updated to match new padding (12px * 0.75 = 9px)
+      right: 9px; // Updated to match new padding
       will-change: transform; // Optimize for animation
 
       @media (max-width: $breakpoint-sm) {
         height: 4px;
         min-height: 4px;
-        border-radius: 2px;
-        left: 8px;
-        right: 8px;
+        border-radius: 0; // No rounded corners
+        left: 6px; // Updated to match new padding (8px * 0.75 = 6px)
+        right: 6px; // Updated to match new padding
       }
       
       // Initial positions for three lines
       &:nth-child(1) {
-        top: 12px;
+        top: 9px; // Updated to match new padding (12px * 0.75 = 9px)
         @media (max-width: $breakpoint-sm) {
-          top: 8px;
+          top: 6px; // Updated to match new padding (8px * 0.75 = 6px)
         }
       }
       &:nth-child(2) {
@@ -271,10 +271,10 @@ a, button {
         }
       }
       &:nth-child(3) {
-        bottom: 12px;
+        bottom: 9px; // Updated to match new padding (12px * 0.75 = 9px)
         top: auto;
         @media (max-width: $breakpoint-sm) {
-          bottom: 8px;
+          bottom: 6px; // Updated to match new padding (8px * 0.75 = 6px)
         }
       }
     }
@@ -461,12 +461,22 @@ a, button {
       pointer-events: none; // Prevent image from blocking clicks
     }
 
+    // Patreon specific color (orange/red)
+    &.social-patreon img {
+      filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(346deg) brightness(98%) contrast(96%);
+    }
+
     &:hover {
       transform: scale(1.15);
       opacity: 0.9;
 
       img {
         filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+      }
+
+      // Patreon hover effect
+      &.social-patreon img {
+        filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(346deg) brightness(98%) contrast(96%) drop-shadow(0 0 8px rgba(255, 66, 77, 0.8));
       }
     }
 
@@ -1067,12 +1077,22 @@ a, button {
       transition: filter 0.3s ease;
     }
 
+    // Patreon specific color (orange/red)
+    &.contact-patreon img {
+      filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(346deg) brightness(98%) contrast(96%);
+    }
+
     &:hover {
       transform: scale(1.15);
       opacity: 0.9;
 
       img {
         filter: brightness(0) invert(1) drop-shadow(0 0 12px rgba(212, 175, 55, 0.8));
+      }
+
+      // Patreon hover effect
+      &.contact-patreon img {
+        filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(346deg) brightness(98%) contrast(96%) drop-shadow(0 0 12px rgba(255, 66, 77, 0.8));
       }
     }
 

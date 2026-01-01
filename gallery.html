@@ -147,7 +147,8 @@ title: Gallery
       if (item.type === 'photo') {
         const img = document.createElement('img');
         img.className = 'gallery-image';
-        img.src = item.url;
+        // Use thumbnail_url for gallery, but keep full url in data-url for lightbox
+        img.src = item.thumbnail_url || item.url;
         img.alt = item.alt || '';
         img.loading = 'lazy';
         itemDiv.appendChild(img);

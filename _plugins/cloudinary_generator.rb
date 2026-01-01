@@ -173,15 +173,37 @@ module Jekyll
 
     def build_media_item(cloud_name, resource, default_alt = nil)
       alt_text = extract_context_value(resource, 'alt') || default_alt || resource['public_id'].split('/').last
-      item = {
-        'type' => resource['resource_type'] == 'video' ? 'video' : 'photo',
-        'url' => get_cloudinary_url(cloud_name, resource['public_id'], resource['format'], resource['resource_type']),
-        'alt' => alt_text
-      }
       
       if resource['resource_type'] == 'video'
+        # For videos, use full URL and optional thumbnail
+        item = {
+          'type' => 'video',
+          'url' => get_cloudinary_url(cloud_name, resource['public_id'], resource['format'], resource['resource_type']),
+          'alt' => alt_text
+        }
         thumbnail = extract_context_value(resource, 'thumbnail')
         item['thumbnail'] = thumbnail if thumbnail
+      else
+        # For photos, generate both thumbnail and full-size URLs
+        # Thumbnail: width 400px, limit size, auto quality and format
+        thumbnail_url = get_cloudinary_url(cloud_name, resource['public_id'], resource['format'], resource['resource_type'], 'w_400,c_limit,q_auto,f_auto')
+        # Full size: limit width to 1920px (sufficient for most screens), economy quality for faster loading, auto format
+        # Options: w_1920 (max width), c_limit (maintain aspect ratio), q_auto:eco (economy quality, smaller file), f_auto (auto format like WebP)
+        # Alternative options:
+        # - q_auto:best - highest quality (largest file)
+        # - q_auto:good - good quality (balanced)
+        # - q_auto:eco - economy quality (smaller file, faster loading) - CURRENT
+        # - q_80 - specific quality 80% (0-100)
+        # - q_75 - specific quality 75% (0-100)
+        # - w_2048 - max width 2048px (for larger screens)
+        full_url = get_cloudinary_url(cloud_name, resource['public_id'], resource['format'], resource['resource_type'], 'w_1080,c_limit,q_auto:eco,f_auto')
+        
+        item = {
+          'type' => 'photo',
+          'url' => full_url, # Full-size URL for lightbox
+          'thumbnail_url' => thumbnail_url, # Thumbnail URL for gallery
+          'alt' => alt_text
+        }
       end
       
       item
@@ -284,14 +306,17 @@ module Jekyll
       { 'resources' => [] }
     end
 
-    def get_cloudinary_url(cloud_name, public_id, format, resource_type = 'image')
+    def get_cloudinary_url(cloud_name, public_id, format, resource_type = 'image', transformations = nil)
       # Remove format extension from public_id if present
       clean_public_id = public_id.gsub(/\.(jpg|jpeg|png|gif|webp|mp4|mov|avi)$/i, '')
       
+      # Build transformation string if provided
+      transform_str = transformations ? "#{transformations}/" : ""
+      
       if resource_type == 'video'
-        "https://res.cloudinary.com/#{cloud_name}/video/upload/#{clean_public_id}.#{format || 'mp4'}"
+        "https://res.cloudinary.com/#{cloud_name}/video/upload/#{transform_str}#{clean_public_id}.#{format || 'mp4'}"
       else
-        "https://res.cloudinary.com/#{cloud_name}/image/upload/#{clean_public_id}.#{format || 'jpg'}"
+        "https://res.cloudinary.com/#{cloud_name}/image/upload/#{transform_str}#{clean_public_id}.#{format || 'jpg'}"
       end
     end
 
@@ -336,6 +361,9 @@ module Jekyll
         yml += "  - type: \"#{item['type']}\"\n"
         yml += "    url: \"#{item['url']}\"\n"
         yml += "    alt: \"#{item['alt']}\"\n"
+        if item['thumbnail_url']
+          yml += "    thumbnail_url: \"#{item['thumbnail_url']}\"\n"
+        end
         if item['thumbnail']
           yml += "    thumbnail: \"#{item['thumbnail']}\"\n"
         end
@@ -359,6 +387,9 @@ module Jekyll
             yml += "      - type: \"#{item['type']}\"\n"
             yml += "        url: \"#{item['url']}\"\n"
             yml += "        alt: \"#{item['alt']}\"\n"
+            if item['thumbnail_url']
+              yml += "        thumbnail_url: \"#{item['thumbnail_url']}\"\n"
+            end
             if item['thumbnail']
               yml += "        thumbnail: \"#{item['thumbnail']}\"\n"
             end
