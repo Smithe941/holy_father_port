@@ -115,7 +115,36 @@ module Jekyll
           
           galleries_hash.sort_by { |k, v| v['number'] }.each do |key, gallery_data|
             gallery_key = gallery_data['name']
-            title_photo = gallery_data['items'].find { |item| item['type'] == 'photo' } || gallery_data['items'].first
+            # Find first photo for title_photo
+            title_photo = gallery_data['items'].find { |item| item['type'] == 'photo' }
+            
+            # If no photo found, generate thumbnail from first video using Cloudinary
+            if !title_photo && gallery_data['items'].any?
+              first_item = gallery_data['items'].first
+              if first_item['type'] == 'video'
+                # Extract public_id from video URL
+                # URL format: https://res.cloudinary.com/cloud_name/video/upload/public_id.mp4
+                video_url = first_item['url']
+                if video_url.include?('/video/upload/')
+                  # Extract public_id from URL
+                  parts = video_url.split('/video/upload/')
+                  if parts.length > 1
+                    public_id_with_ext = parts[1]
+                    public_id = public_id_with_ext.gsub(/\.(mp4|mov|avi|webm)$/i, '')
+                    
+                    # Generate thumbnail from video using Cloudinary
+                    # Use video/upload/so_0 (start offset 0) to get first frame as image
+                    thumbnail_url = "https://res.cloudinary.com/#{cloud_name}/video/upload/so_0,w_1920,c_limit,q_auto:good,f_jpg/#{public_id}"
+                    
+                    title_photo = {
+                      'type' => 'photo',
+                      'url' => thumbnail_url,
+                      'alt' => first_item['alt']
+                    }
+                  end
+                end
+              end
+            end
             
             media_data['galleries'][gallery_key] = {
               'title' => gallery_data['title'],
